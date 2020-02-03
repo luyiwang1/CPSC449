@@ -1,0 +1,137 @@
+module A1 where
+
+{-
+ CPSC 449 Assignment 1
+ UCID: 30033104
+ Studnent name : Luyi Wang
+-}
+
+--import Test.QuickCheck
+
+{-
+    Question1
+  The purpose of this function (myGCD) is find the gcd (greatest common divisor) of two Integers.
+  There are two Integers called a and b which are two formal parameters, we may assume the arguments are both positive.
+  The preconditions are the inputs are both positive integers.
+  The return value of this function will be a positive integer and it is the greatest common divisor of two input integers.
+
+-}
+myGCD :: Integer -> Integer -> Integer
+myGCD a b
+  | b == 0 =  abs a
+  | otherwise  = myGCD b (a `mod` b)
+
+
+{- 
+    Question2
+	The first function is called divisors.
+  The purpose of this function (divisors) is find all divisors of the input integer.
+  There is only one positive integer called a as a formal parameter.
+  The precondition is the input is a integer that greater or equal to 1.
+  The return value of this function is a list, which contains all divisors of the input positive integer.
+  
+    The second function is called isPrime.
+  The purpose of this function (isPrime) is verified the input is prime or not.
+  There is only one positive integer called a as a formal parameter.
+  The precondition is the input is a integer which greater or equal to 1.
+  The return value of this function is a boolean, true means the input is a prime; false means the input is not a prime.
+-}
+divisors :: Integer -> [Integer]
+divisors a = [b | b <- [1..a], a `rem` b == 0]
+
+isPrime :: Integer -> Bool
+isPrime a
+ | length (divisors a) == 2 = True
+ | otherwise = False
+
+
+ 
+--Question3
+type Person = String
+type Book = String
+type Database = [(Person, [Book])]
+
+dBase :: Database
+dBase = [("Alice" , ["Tintin"]) , ("Anna" , ["Little Women"]),
+         ("Alice" , ["Asterix"]) ,("Rory" , ["Tintin"]) ]
+
+{-
+  The purpose of this function is find the book who borrowed.
+  The formal parameter : the person which is a String and the database that contains many people and books.
+  The precondition : generates the possible value from database, when the person we choose has find in the database, it will return the book.
+  The return value : Books which the person borrowed.
+-}
+books :: Database -> Person -> [Book]
+books dBase fperson = [ b | (p, [b]) <- dBase , p == fperson]
+
+{-
+  The purpose of this function is find the person who borrowed specified book.
+  The formal parameter : the book which is a String and the database that contains many people and books.
+  The precondition : generates the possible value from database, when the book we choose has find in the database, it will return the person.
+  The return value : the person who borrowed specified book.
+-}
+borrowers :: Database -> Book -> [Person]
+borrowers dBase fbook = [ p | (p, b) <- dBase , b == [fbook]]
+
+{-
+  The purpose of this function is find the book has been borrowed or not.
+  The formal parameter : the Book which is a String and the database that contains many people and books.
+  The precondition : input fbook as a string and searching for the book from database, use list comprehension to find is the book the database or not.
+  The return value : if there is a match in the database, return true; if not, return false.
+-}
+borrowed :: Database -> Book -> Bool
+borrowed dBase fbook = fbook `elem` [book | (_, [book]) <- dBase]
+
+{-
+  The purpose of this function is tells how many books that the person borrowed.
+  The formal parameter : the person which is a String and the database that contains many people and books.
+  The precondition : input the person as a String and test the length of how many book the selected person borrowed.
+  The return value : a integer repersent that how many book the selected person borrowed.
+-}
+numBorrowed :: Database -> Person -> Int
+numBorrowed dBase fperson = length (books dBase fperson)
+
+{-
+  The purpose of this function is update the database if people add book into it.
+  The formal parameter : the person and book which are Strings and the database that contains many people and books.
+  The precondition : adding the selected person and book into the database, and update the database.
+  The return value : the updated database.
+-}
+makeLoan :: Database -> Person -> Book -> Database
+makeLoan dBase fperson fbook = [ (p,b) | (p,b) <- dBase , p /= fperson] ++ [ (p, fbook : b) | (p,b) <- dBase , p == fperson] 
+
+{-
+  The purpose of this function is update the database if people remove book.
+  The formal parameter : the person and book which are Strings and the database that contains many people and books.
+  The precondition : remove the selected person and book from the database, and update the database.
+  The return value : the updated database.
+-}
+returnLoan :: Database -> Person -> Book -> Database
+returnLoan dBase fperson fbook = [(fperson, [ book | (p,b) <-dBase , p == fperson, book <- b , fbook /= book])] ++ [(p,b) | (p,b) <- dBase , p /= fperson]
+
+
+-- Question4
+type Picture = [[Char]]
+draw :: Picture
+draw = [['#', '.', '.', '.' ],
+        ['#', '#', '#', '#' ],
+        ['#', '#', '.', '#' ],
+        ['#', '#', '#', '.' ]]
+
+{-
+  The purpose of this function is rotate the picture which we given.
+  The formal parameter : the picture draw which contains four lists.
+  The precondition : use list comprehension to generates the new diagram.
+  The return value : the rotate90 picture which contains four strings.
+-}
+rotate90 :: Picture -> Picture
+rotate90 draw = other[concat [[line !! a] | line <- draw] | a <- [0..(length draw) - 1]]
+
+{-
+  The purpose of this function is rotate the line.
+  The formal parameter : the integer x
+  The precondition : use reverse command to generates the reverse lines.
+  The return value : the reverse list of char from the picture.
+-}
+other :: Picture -> Picture
+other draw = [reverse line | line <- draw]
